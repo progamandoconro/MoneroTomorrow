@@ -62,7 +62,9 @@ ui <- fluidPage(
       
       # Show a plot of the generated distribution
       mainPanel(
-        plotOutput("distPlot")
+        plotOutput("distPlot"),
+        h5("Dirección Monero para apoyar al proyecto: "),
+        h5("45YgkhGVzYjHSHs5LKpuK1b8Qzt8NewBBQEGAM94MdzPabGCCeKxrT85d6UVGqav5raJwgKNQkn47chLVuoZ6taK4t7h7Ah")
       )
    )
 )
