@@ -13,17 +13,15 @@ TomorrowDate <- function(x)
     format = "%Y.%m.%d"
   )
 
-setwd("~/Documents/monero")
+#setwd("~/Documents/monero/")
 
 #download("https://coinmetrics.io/data/all.zip", dest="dataset.zip", mode="wb") 
 #unzip ("dataset.zip", exdir = "./")
 #file.remove("dataset.zip")
 
-file_vec <- list.files()
+file_vec <- list.files(pattern = ".csv")
 
 expl<- file_vec[-which(file_vec=="xmr.csv")]
-
-
 
 l <- lapply(expl, read.csv)
 
@@ -47,23 +45,29 @@ t <- read.csv("xmr.csv")
 ui <- fluidPage(
    
    # Application title
-   titlePanel("Aprendizaje automatizado para predecir Monero mañana"),
+   titlePanel("Aprendizaje automatizado para predecir precio del Monero de mañana"),
    h5("Creada por Rodrigo Díaz Lupanow"),
    
    # Sidebar with a slider input for number of bins 
    sidebarLayout(
       sidebarPanel(
-         sliderInput("range", "Months from 1983 to 2016:",
-                     min = 800, max = nrow(x), value = c(nrow(x)-60,nrow(x))),
+         sliderInput("range", "Días (desde Mañana menos 1000):",
+                     min = 800, max = 999, value = c(999-60,999)),
+         h5("Parámetros del modelo en línea ROJA"),
          numericInput("bins2",value = 0.5,label = "Cost"),
-         selectInput("bins3","Kernel",c("radial","sigmoid","polynomial","linear"),selected = "polynomial")
-         
+         selectInput("bins3","Kernel",c("radial","sigmoid","polynomial","linear"),selected = "polynomial"),
+         numericInput("bins4",value = 0.5,label = "Gamma"),
+         numericInput("bins5",value = 0,label = "coef0"),
+         textOutput('text1')
+        
       ),
       
       # Show a plot of the generated distribution
       mainPanel(
         h5("Resultados de SVM entrenado con 1000 días antes de hoy",Sys.Date()),
         plotOutput("distPlot"),
+        h5("Línea contínua negra: Datos reales, Línea azul: Modelo SVM (radial cost 1), Línea Roja: SVM afinable por ti"),
+        h5("Esta app está en período de prueba, es principalmente un material de investigación y difusión. "),
         h5("Dirección Monero para apoyar al proyecto: "),
         h5("45YgkhGVzYjHSHs5LKpuK1b8Qzt8NewBBQEGAM94MdzPabGCCeKxrT85d6UVGqav5raJwgKNQkn47chLVuoZ6taK4t7h7Ah")
       )
@@ -106,7 +110,8 @@ server <- function(input, output) {
      cv <- x [alea,] # nos quedamos con 1/3 para evaluar
      
      model<- svm(tr$target~.,data = tr,scale = T)
-     model2<- svm(tr$target~.,data = tr,scale = T,cost=input$bins2,kernel=input$bins3)
+     model2<- svm(tr$target~.,data = tr,scale = T,
+                  cost=input$bins2,kernel=input$bins3,gamma=input$bins4,coef0=input$bins5)
      
      r<-predict(model,xsn[2:1000,-1])
      r2<-predict(model2,xsn[2:1000,-1])
@@ -124,11 +129,17 @@ server <- function(input, output) {
        xlab("Tiempo (Días)")+ylab("Precio escalado")+ 
        theme(panel.grid.minor = element_line(colour="black"))
        scale_x_continuous(minor_breaks = seq(a,b, 1))
+       
+      
      
      
 g
      
    })
+   
+  
+   
+   
 }
 
 # Run the application 
