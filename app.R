@@ -120,12 +120,12 @@ server <- function(input, output) {
      g<- ggplot(data = xsn[a:b,],aes(x=a:b,y=r[a:b]))
      
      g<-g+geom_point(col="blue",size=0.5)+geom_line(col="blue",linetype=2,size=0.5)+
-       geom_point(aes(y=x[(a+1):(b+1),1]),col="black",size=0.5)+
-       geom_line(aes(y=x[(a+1):(b+1),1]),col="black",size=0.5)+
+       geom_point(aes(y=xsn[(a+1):(b+1),1]),col="black",size=0.5)+
+       geom_line(aes(y=xsn[(a+1):(b+1),1]),col="black",size=0.5)+
        geom_line(aes(y=r2[a:b]),col="red")+
        annotate("text",x=b,y=r[b],label=TomorrowDate(Sys.Date()),color="blue",size=3)+
        annotate("text",x=b,y=r[b-2],label=(Sys.Date()),color="blue",size=3)+
-       annotate("text",x=b,y=x[b,1],label=(Sys.Date()),color="black",size=3)+
+       annotate("text",x=b,y=xsn[b+1,1],label=(Sys.Date()),color="black",size=3)+
        xlab("Tiempo (Días)")+ylab("Precio escalado")+ 
        theme(panel.grid.minor = element_line(colour="black"))
        scale_x_continuous(minor_breaks = seq(a,b, 1))
