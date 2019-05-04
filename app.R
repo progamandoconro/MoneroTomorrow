@@ -13,11 +13,11 @@ TomorrowDate <- function(x)
     format = "%Y.%m.%d"
   )
 
-#setwd("~/Documents/monero/")
+setwd("~/Documents/monero/")
 
-#download("https://coinmetrics.io/data/all.zip", dest="dataset.zip", mode="wb") 
-#unzip ("dataset.zip", exdir = "./")
-#file.remove("dataset.zip")
+download("https://coinmetrics.io/data/all.zip", dest="dataset.zip", mode="wb") 
+unzip ("dataset.zip", exdir = "./")
+file.remove("dataset.zip")
 
 file_vec <- list.files(pattern = ".csv")
 
