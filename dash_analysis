@@ -1,100 +1,105 @@
- library(downloader)
-  library(e1071)
-  library(shiny)
-  library(shinydashboard)
-  library(ggplot2)
-  library(shinyWidgets)
-  
-  normalize <- function(x) { 
-    return((x - min(x)) / (max(x) - min(x)))
-  }
-  
-  TomorrowDate <- function(x) 
-    format(
-      as.Date(x, format = "%Y.%m.%d") + 1, 
-      format = "%Y.%m.%d"
-    )
-  
-  #setwd("~/Documents/monero/")
-  
-  # download("https://coinmetrics.io/data/all.zip", dest="dataset.zip", mode="wb") 
-  # unzip ("dataset.zip", exdir = "./")
-  # file.remove("dataset.zip")
-  
-  file_vec <- list.files(pattern = ".csv")
-  sselec<- lapply(file_vec,read.csv)
-  names(sselec)<-file_vec
-  n<-lapply(sselec, colnames)
-  
-  
-    header <- dashboardHeader()
-    
-    sidebar <- dashboardSidebar(
+      library(downloader)
+      library(e1071)
+      library(shiny)
+      library(shinydashboard)
+      library(ggplot2)
+      library(shinyWidgets)
       
-      sidebarMenu(
-        # Setting id makes input$tabs give the tabName of currently-selected tab
-        id = "tabs",
+      normalize <- function(x) { 
+        return((x - min(x)) / (max(x) - min(x)))
+      }
+      
+      TomorrowDate <- function(x) 
+        format(
+          as.Date(x, format = "%Y.%m.%d") + 1, 
+          format = "%Y.%m.%d"
+        )
+      
+      #setwd("~/Documents/monero/")
+      
+      # download("https://coinmetrics.io/data/all.zip", dest="dataset.zip", mode="wb") 
+      # unzip ("dataset.zip", exdir = "./")
+      # file.remove("dataset.zip")
+      
+      file_vec <- list.files(pattern = ".csv")
+      sselec<- lapply(file_vec,read.csv)
+      names(sselec)<-file_vec
+      n<-lapply(sselec, colnames)
+      
+      
+        header <- dashboardHeader()
         
-        menuItem("Introducción", tabName = "intro"
-                 
-        ),
-       
-         menuItem("Análisis", icon = icon("bar-chart-o"), tabName = "lisis",
-                
-                 menuSubItem("Exploración de data", tabName = "subitem1"),
-                 menuSubItem("Selección de modelo", tabName = "subitem2")
-                 
-                 )
+        sidebar <- dashboardSidebar(
+          
+          sidebarMenu(
+            # Setting id makes input$tabs give the tabName of currently-selected tab
+            id = "tabs",
+            
+            menuItem("Introducción", tabName = "intro"
+                     
+            ),
+           
+             menuItem("Análisis", icon = icon("bar-chart-o"), tabName = "lisis",
+                    
+                     menuSubItem("Exploración de data", tabName = "subitem1"),
+                     menuSubItem("Selección de modelo", tabName = "subitem2")
+                     
+                     )
+            
+            
+            
+          )
+        )
         
+        body <- dashboardBody(
+          
+          tabItems(
+            
+            tabItem("intro",
+            
+            h5("Nota del autor: Este es un proyecto parte del blog RconRo. El objetivo es obtener predicciones del cambio en el precio de un estimador para día próximo al análisis. Primero se hará un estudio de la data, desde un exploración inicial, hasta algoritmos que nos revelen información")   
+            
+            
+            ),
+            
+            tabItem("subitem1",
+                    selectInput("bins32","Crypomoneda",choices = file_vec),
+                   
+          
+           
+              plotOutput("distPlot",height = "800px")
+             
+            
+          ),
+          
+          tabItem("subitem2",
+                  selectInput("bins32","Var. dependiente",choices = n,selectize = F),
+                  pickerInput("bins33","Var. independientes",choices = n,
+                              multiple = T,options = list('actions-box' = TRUE)),
+                  sliderInput("range", "Últimos 200 días (y predicciones para mañana) ):",
+                              min = 800, max = 999, value = c(800,999))
+          )
+        )
+        )
         
+        server <- function(input, output) {
+          
+          output$distPlot <- renderPlot({
+            
+            v<-sselec[[input$bins32]]
+           
+            
+                plot(v)
+            
+          })
+          
+          
+          
+          
+        }
         
+      
+      shinyApp(
+        ui = dashboardPage(header, sidebar, body),
+        server = server
       )
-    )
-    
-    body <- dashboardBody(
-      
-      tabItems(
-        
-        tabItem("intro",
-        
-        h5("Nota del autor: Este es un proyecto parte del blog RconRo. El objetivo es obtener predicciones del cambio en el precio de un estimador para día próximo al análisis. en un estimador a partir de un modelo")   
-        
-        
-        ),
-        
-        tabItem("subitem1",
-                selectInput("bins32","Crypomoneda",choices = file_vec),
-      
-       
-          plotOutput("distPlot")
-         
-        
-      ),
-      
-      tabItem("subitem2",
-              selectInput("bins32","Var. dependiente",choices = n,selectize = F),
-              pickerInput("bins33","Var. independientes",choices = n,
-                          multiple = T,options = list('actions-box' = TRUE))
-      )
-    )
-    )
-    
-    server <- function(input, output) {
-      
-      output$distPlot <- renderPlot({
-
-        
-  plot(sselec[[input$bins32]])
-        
-      })
-      
-      
-      
-      
-    }
-    
-  
-  shinyApp(
-    ui = dashboardPage(header, sidebar, body),
-    server = server
-  )
